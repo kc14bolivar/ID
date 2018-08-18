@@ -1,0 +1,62 @@
+Option Compare Database
+
+Private Sub btnTakePicture_Click()
+'Take a picture from a webcam and store it in a temp file.
+'By Justin Johnson Nov 26, 2007
+
+ 
+
+On Error GoTo Err_btnTakePicture_click
+
+ 
+
+Dim tempfile As String
+Dim mydevice As WIA.Device
+Dim item As WIA.item
+Dim imfile As WIA.imagefile
+Dim Commondialog1 As WIA.CommonDialog
+
+ 
+
+'put the path and name for the location of your temp file here.
+tempfile = ("path\filename.jpg")
+
+ 
+
+'the next 4 lines deletes the old temp file if it exists
+Set filesystemobject = CreateObject("Scripting.FileSystemObject")
+If filesystemobject.FileExists(tempfile) Then
+    Kill (tempfile)
+End If
+
+ 
+
+'the next two lines set up the configuration
+Set Commondialog1 = New CommonDialog
+Set mydevice = Commondialog1.ShowSelectDevice
+
+ 
+
+Set item = mydevice.ExecuteCommand(wiaCommandTakePicture) 'instructs the camera to take the picture
+Set imfile = item.Transfer 'transfers the picture from the camera
+
+ 
+
+'this line saves the picture to a specified file
+imfile.SaveFile (tempfile)
+
+'this sets the picture on the form to show the new picture
+Me.OLEUnbound1.Picture = (tempfile)
+
+MsgBox "Picture taken"
+
+Exit_btnTakePicture_click:
+    Set mydevice = Nothing
+    Set item = Nothing
+    Exit Sub
+
+Err_btnTakePicture_click:
+    MsgBox Err.Description, vbOKOnly + vbCritical, "Error Taking Picture"
+    Resume Exit_btnTakePicture_click
+
+End Sub
